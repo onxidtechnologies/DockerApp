@@ -19,7 +19,7 @@ RUN npm install
 COPY . ./
 
 # Expose port 4200 to make it available to be bound on the host machine
-EXPOSE 4200
+#EXPOSE 4200
 
 # Define an Entrypoint from where the commands can be executed
 ENTRYPOINT ["./node_modules/.bin/ng"]

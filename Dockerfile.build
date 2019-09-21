@@ -1,0 +1,31 @@
+# Base image should contain NodeJS published with the tag 10.16.3
+# Tag in NodeJS images means the version of NodeJS installed in the image
+# alpine is a very light weight linux distro
+# this will spawn intermediate containers only to build the app
+# it is aliased as "builder"
+FROM node:10.16.3-alpine AS builder
+
+# Create a new directory where we will move our code
+RUN mkdir -p /docker-app
+
+# Set the created directory as the default directory for future commands
+WORKDIR /docker-app
+
+# Copy the package.json package-lock.json into the Workdir
+COPY package.json package-lock.json ./
+
+# Run npm install to install all dependencies
+RUN npm install
+
+# Copy rest of the sorce code folders into the Workdir
+COPY . ./
+
+# Issue command to create a build from ng-cli
+RUN ./node_modules/.bin/ng build
+
+# Base image of webserver containing nginx version 1.16.1
+# alpine is a very light weight linux distro
+FROM nginx:1.16.1-alpine
+
+# Copy build from builder image (above) "docker-app/dist/*" to html folder to serve via nginx
+COPY --from=builder /docker-app/dist/* /usr/share/nginx/html
